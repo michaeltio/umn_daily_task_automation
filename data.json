@@ -1,16 +1,30 @@
 [
   {
-    "date": "30-08-2025",
+    "date": "08-10-2025",
     "start_time": "08:00",
     "end_time": "17:00",
-    "task_description": "Mengkonsolidasikan seluruh pemahaman yang telah diperoleh dari studi dokumentasi, testing, dan diskusi sebagai persiapan untuk memulai tahap pengembangan berikutnya.",
+    "task_description": "http://127.0.0.1:5000",
     "approver": "Supervisor"
   },
   {
-    "date": "01-09-2025",
+    "date": "08-10-2025",
+    "start_time": "19:00",
+    "end_time": "21:00",
+    "task_description": "http://127.0.0.1:5000",
+    "approver": "Advisor"
+  },
+  {
+    "date": "09-10-2025",
     "start_time": "08:00",
     "end_time": "17:00",
-    "task_description": "Memulai pembelajaran dasar bahasa pemrograman Go (Golang) sebagai fondasi proyek, dengan fokus memahami sintaks dasar dan environment development.",
+    "task_description": "http://127.0.0.1:5000",
     "approver": "Supervisor"
+  },
+  {
+    "date": "09-10-2025",
+    "start_time": "19:00",
+    "end_time": "21:00",
+    "task_description": "http://127.0.0.1:5000",
+    "approver": "Advisor"
   }
 ]

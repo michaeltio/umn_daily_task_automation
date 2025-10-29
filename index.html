@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Calendar Scheduler</title>
+    <style>
+      #calendar {
+        display: grid;
+        gap: 5px;
+      }
+      .weekdays {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        font-weight: bold;
+      }
+      .dates-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 5px;
+      }
+      .date-cell {
+        border: 1px solid #ccc;
+        padding: 5px;
+        min-height: 120px;
+        display: flex;
+        flex-direction: column;
+      }
+      .input-block {
+        margin-top: 5px;
+        display: flex;
+        flex-direction: column;
+      }
+      .empty {
+        border: none;
+      }
+      input.overlap {
+        border-color: red !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <select id="month"></select>
+      <select id="year"></select>
+    </div>
+
+    <div style="margin: 10px 0">
+      <div>
+        <label
+          >Supervisor Set All Start:
+          <input type="time" id="sup-all-start" value="08:00"
+        /></label>
+        <label
+          >Supervisor Set All End:
+          <input type="time" id="sup-all-end" value="17:00"
+        /></label>
+        <button id="apply-sup">Apply to All Supervisor</button>
+      </div>
+      <div>
+        <label
+          >Advisor Set All Start:
+          <input type="time" id="adv-all-start" value="19:00"
+        /></label>
+        <label
+          >Advisor Set All End:
+          <input type="time" id="adv-all-end" value="21:00"
+        /></label>
+        <button id="apply-adv">Apply to All Advisor</button>
+      </div>
+      <button id="save-json">Save</button>
+    </div>
+
+    <div id="calendar"></div>
+
+    <script>
+      const monthNames = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ];
+      const today = new Date();
+      const currentMonth = today.getMonth();
+      const currentYear = today.getFullYear();
+      const monthSelect = document.getElementById("month");
+      const yearSelect = document.getElementById("year");
+
+      monthNames.forEach((m, i) => {
+        const opt = document.createElement("option");
+        opt.value = i;
+        opt.textContent = m;
+        if (i === currentMonth) opt.selected = true;
+        monthSelect.appendChild(opt);
+      });
+      for (let y = 2001; y <= 2099; y++) {
+        const opt = document.createElement("option");
+        opt.value = y;
+        opt.textContent = y;
+        if (y === currentYear) opt.selected = true;
+        yearSelect.appendChild(opt);
+      }
+
+      function generateCalendar(month, year) {
+        const calendar = document.getElementById("calendar");
+        calendar.innerHTML = "";
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        let html = '<div class="weekdays">';
+        ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].forEach(
+          (d) => (html += `<div class="day-header">${d}</div>`)
+        );
+        html += '</div><div class="dates-grid">';
+
+        for (let i = 0; i < firstDay; i++) html += '<div class="empty"></div>';
+
+        for (let d = 1; d <= daysInMonth; d++) {
+          html += `
+    <div class="date-cell">
+      <div class="date-label">${d}</div>
+      <div class="input-block">
+        <label>Supervisor</label>
+        <input type="text" placeholder="task" class="supervisor-task"/>
+        <input type="time" value="08:00" class="supervisor-start"/>
+        <input type="time" value="17:00" class="supervisor-end"/>
+      </div>
+      <div class="input-block">
+        <label>Advisor</label>
+        <input type="text" placeholder="task" class="advisor-task"/>
+        <input type="time" value="19:00" class="advisor-start"/>
+        <input type="time" value="21:00" class="advisor-end"/>
+      </div>
+    </div>`;
+        }
+
+        html += "</div>";
+        calendar.innerHTML = html;
+
+        // attach input event listener untuk overlap realtime
+        document
+          .querySelectorAll(
+            ".supervisor-start,.supervisor-end,.advisor-start,.advisor-end"
+          )
+          .forEach((input) => {
+            input.addEventListener("input", (e) => {
+              const cell = e.target.closest(".date-cell");
+              checkOverlap(cell);
+            });
+          });
+      }
+
+      function checkOverlap(cell) {
+        const supStart = cell.querySelector(".supervisor-start").value;
+        const supEnd = cell.querySelector(".supervisor-end").value;
+        const advStart = cell.querySelector(".advisor-start").value;
+        const advEnd = cell.querySelector(".advisor-end").value;
+
+        cell
+          .querySelectorAll("input")
+          .forEach((i) => i.classList.remove("overlap"));
+
+        if (supStart && supEnd && advStart && advEnd) {
+          if (!(supEnd <= advStart || advEnd <= supStart)) {
+            cell
+              .querySelectorAll("input")
+              .forEach((i) => i.classList.add("overlap"));
+            return true;
+          }
+        }
+        return false;
+      }
+
+      function saveTasks() {
+        const data = [];
+        let hasOverlap = false;
+        document.querySelectorAll(".date-cell").forEach((cell) => {
+          if (checkOverlap(cell)) hasOverlap = true;
+          const dateLabel = cell.querySelector(".date-label").textContent;
+          const month = parseInt(monthSelect.value) + 1;
+          const year = parseInt(yearSelect.value);
+
+          const supervisorTask = cell
+            .querySelector(".supervisor-task")
+            .value.trim();
+          const supervisorStart = cell.querySelector(".supervisor-start").value;
+          const supervisorEnd = cell.querySelector(".supervisor-end").value;
+
+          const advisorTask = cell.querySelector(".advisor-task").value.trim();
+          const advisorStart = cell.querySelector(".advisor-start").value;
+          const advisorEnd = cell.querySelector(".advisor-end").value;
+
+          if (supervisorTask) {
+            data.push({
+              date: `${String(dateLabel).padStart(2, "0")}-${String(
+                month
+              ).padStart(2, "0")}-${year}`,
+              start_time: supervisorStart,
+              end_time: supervisorEnd,
+              task_description: supervisorTask,
+              approver: "Supervisor",
+            });
+          }
+          if (advisorTask) {
+            data.push({
+              date: `${String(dateLabel).padStart(2, "0")}-${String(
+                month
+              ).padStart(2, "0")}-${year}`,
+              start_time: advisorStart,
+              end_time: advisorEnd,
+              task_description: advisorTask,
+              approver: "Advisor",
+            });
+          }
+        });
+
+        if (hasOverlap) {
+          alert(
+            "Error: Supervisor & Advisor time overlap detected! Fix before saving."
+          );
+          return;
+        }
+
+        fetch("http://127.0.0.1:5000/save", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        })
+          .then((res) => res.json())
+          .then((res) => alert(res.message))
+          .catch((err) => alert("Error saving: " + err));
+      }
+
+      // Apply to All Supervisor
+      document.getElementById("apply-sup").addEventListener("click", () => {
+        const start = document.getElementById("sup-all-start").value;
+        const end = document.getElementById("sup-all-end").value;
+        document
+          .querySelectorAll(".supervisor-start")
+          .forEach((i) => (i.value = start));
+        document
+          .querySelectorAll(".supervisor-end")
+          .forEach((i) => (i.value = end));
+        document
+          .querySelectorAll(".date-cell")
+          .forEach((cell) => checkOverlap(cell));
+      });
+
+      // Apply to All Advisor
+      document.getElementById("apply-adv").addEventListener("click", () => {
+        const start = document.getElementById("adv-all-start").value;
+        const end = document.getElementById("adv-all-end").value;
+        document
+          .querySelectorAll(".advisor-start")
+          .forEach((i) => (i.value = start));
+        document
+          .querySelectorAll(".advisor-end")
+          .forEach((i) => (i.value = end));
+        document
+          .querySelectorAll(".date-cell")
+          .forEach((cell) => checkOverlap(cell));
+      });
+
+      document.getElementById("save-json").addEventListener("click", saveTasks);
+
+      generateCalendar(currentMonth, currentYear);
+      monthSelect.addEventListener("change", () =>
+        generateCalendar(
+          parseInt(monthSelect.value),
+          parseInt(yearSelect.value)
+        )
+      );
+      yearSelect.addEventListener("change", () =>
+        generateCalendar(
+          parseInt(monthSelect.value),
+          parseInt(yearSelect.value)
+        )
+      );
+    </script>
+  </body>
+</html>
