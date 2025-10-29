@@ -73,6 +73,7 @@
     <div id="calendar"></div>
 
     <script>
+      let allData = [];
       const monthNames = [
         "January",
         "February",
@@ -128,13 +129,13 @@
       <div class="date-label">${d}</div>
       <div class="input-block">
         <label>Supervisor</label>
-        <input type="text" placeholder="task" class="supervisor-task"/>
+        <textarea placeholder="task" class="supervisor-task" rows="5"></textarea>
         <input type="time" value="08:00" class="supervisor-start"/>
         <input type="time" value="17:00" class="supervisor-end"/>
       </div>
       <div class="input-block">
         <label>Advisor</label>
-        <input type="text" placeholder="task" class="advisor-task"/>
+        <textarea placeholder="task" class="advisor-task" rows="5"></textarea>
         <input type="time" value="19:00" class="advisor-start"/>
         <input type="time" value="21:00" class="advisor-end"/>
       </div>
@@ -178,14 +179,22 @@
         return false;
       }
 
-      function saveTasks() {
-        const data = [];
+      function saveTasks(auto = false) {
+        const month = parseInt(monthSelect.value) + 1;
+        const year = parseInt(yearSelect.value);
+        const monthStr = String(month).padStart(2, "0");
+        const yearStr = String(year);
+
+        const cells = document.querySelectorAll(".date-cell");
         let hasOverlap = false;
-        document.querySelectorAll(".date-cell").forEach((cell) => {
+
+        cells.forEach((cell) => {
           if (checkOverlap(cell)) hasOverlap = true;
-          const dateLabel = cell.querySelector(".date-label").textContent;
-          const month = parseInt(monthSelect.value) + 1;
-          const year = parseInt(yearSelect.value);
+
+          const dateLabel = String(
+            cell.querySelector(".date-label").textContent
+          ).padStart(2, "0");
+          const dateStr = `${dateLabel}-${monthStr}-${yearStr}`;
 
           const supervisorTask = cell
             .querySelector(".supervisor-task")
@@ -197,11 +206,18 @@
           const advisorStart = cell.querySelector(".advisor-start").value;
           const advisorEnd = cell.querySelector(".advisor-end").value;
 
+          // hapus entry lama untuk tanggal ini dan approver
+          allData = allData.filter(
+            (item) =>
+              !(
+                item.date === dateStr &&
+                (item.approver === "Supervisor" || item.approver === "Advisor")
+              )
+          );
+
           if (supervisorTask) {
-            data.push({
-              date: `${String(dateLabel).padStart(2, "0")}-${String(
-                month
-              ).padStart(2, "0")}-${year}`,
+            allData.push({
+              date: dateStr,
               start_time: supervisorStart,
               end_time: supervisorEnd,
               task_description: supervisorTask,
@@ -209,10 +225,8 @@
             });
           }
           if (advisorTask) {
-            data.push({
-              date: `${String(dateLabel).padStart(2, "0")}-${String(
-                month
-              ).padStart(2, "0")}-${year}`,
+            allData.push({
+              date: dateStr,
               start_time: advisorStart,
               end_time: advisorEnd,
               task_description: advisorTask,
@@ -222,22 +236,30 @@
         });
 
         if (hasOverlap) {
-          alert(
-            "Error: Supervisor & Advisor time overlap detected! Fix before saving."
-          );
-          return;
+          if (!auto)
+            alert(
+              "Error: Supervisor & Advisor time overlap detected! Fix before saving."
+            );
+          return false;
         }
 
+        // POST seluruh allData
         fetch("http://127.0.0.1:5000/save", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
+          body: JSON.stringify(allData),
         })
           .then((res) => res.json())
-          .then((res) => alert(res.message))
-          .catch((err) => alert("Error saving: " + err));
-      }
+          .then((res) => {
+            if (!auto) console.log("Auto-saved");
+            if (!auto) alert(res.message);
+          })
+          .catch((err) => {
+            if (!auto) alert("Error saving: " + err);
+          });
 
+        return true;
+      }
       // Apply to All Supervisor
       document.getElementById("apply-sup").addEventListener("click", () => {
         const start = document.getElementById("sup-all-start").value;
