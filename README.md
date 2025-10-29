@@ -67,3 +67,6 @@ python main.py
 ## 📌 Catatan Tambahan
 
 - Apabila terdapat bug atau output tidak sesuai tolong hubungi developer
+
+## Inspired by
+Project ini terinspirasi dari [oscarjiro](https://github.com/oscarjiro).
