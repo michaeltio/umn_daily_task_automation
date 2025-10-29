@@ -69,4 +69,4 @@ python main.py
 - Apabila terdapat bug atau output tidak sesuai tolong hubungi developer
 
 ## Inspired by
-Project ini terinspirasi dari [oscarjiro](https://github.com/username/repo](https://github.com/oscarjiro).
+Project ini terinspirasi dari [oscarjiro](https://github.com/oscarjiro).
