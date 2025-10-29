@@ -3,7 +3,23 @@
   <head>
     <meta charset="utf-8" />
     <title>Calendar Scheduler</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
     <style>
+      body {
+        font-family: "Poppins", sans-serif;
+      }
+
+      textarea {
+        background-color: white;
+      }
+
+      textarea.filled {
+        background-color: #a8e6a3;
+      }
+
       #calendar {
         display: grid;
         gap: 5px;
@@ -11,16 +27,20 @@
       .weekdays {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
+        border: 1px solid #000;
+        text-align: center;
         font-weight: bold;
       }
       .dates-grid {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
+
         gap: 5px;
       }
       .date-cell {
-        border: 1px solid #ccc;
-        padding: 5px;
+        border-radius: 1rem;
+        border: 1px solid #000;
+        padding: 10px;
         min-height: 120px;
         display: flex;
         flex-direction: column;
@@ -31,7 +51,9 @@
         flex-direction: column;
       }
       .empty {
-        border: none;
+        border-radius: 1rem;
+        background-color: #353535;
+        border: 1px solid #000;
       }
       input.overlap {
         border-color: red !important;
@@ -145,7 +167,6 @@
         html += "</div>";
         calendar.innerHTML = html;
 
-        // attach input event listener untuk overlap realtime
         document
           .querySelectorAll(
             ".supervisor-start,.supervisor-end,.advisor-start,.advisor-end"
@@ -206,7 +227,7 @@
           const advisorStart = cell.querySelector(".advisor-start").value;
           const advisorEnd = cell.querySelector(".advisor-end").value;
 
-          // hapus entry lama untuk tanggal ini dan approver
+
           allData = allData.filter(
             (item) =>
               !(
@@ -243,7 +264,7 @@
           return false;
         }
 
-        // POST seluruh allData
+   
         fetch("http://127.0.0.1:5000/save", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -260,7 +281,7 @@
 
         return true;
       }
-      // Apply to All Supervisor
+  
       document.getElementById("apply-sup").addEventListener("click", () => {
         const start = document.getElementById("sup-all-start").value;
         const end = document.getElementById("sup-all-end").value;
@@ -275,7 +296,7 @@
           .forEach((cell) => checkOverlap(cell));
       });
 
-      // Apply to All Advisor
+
       document.getElementById("apply-adv").addEventListener("click", () => {
         const start = document.getElementById("adv-all-start").value;
         const end = document.getElementById("adv-all-end").value;
@@ -305,6 +326,26 @@
           parseInt(yearSelect.value)
         )
       );
+
+
+      const textareas = document.querySelectorAll("textarea");
+
+      textareas.forEach((textarea) => {
+    
+        function checkContent() {
+          if (textarea.value.trim() !== "") {
+            textarea.classList.add("filled"); 
+          } else {
+            textarea.classList.remove("filled"); 
+          }
+        }
+
+       
+        textarea.addEventListener("input", checkContent);
+
+        
+        checkContent();
+      });
     </script>
   </body>
 </html>
