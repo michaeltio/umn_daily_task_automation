@@ -85,10 +85,9 @@ for item in data:
     current_start = start_time_field.get_attribute("value")
     current_end = end_time_field.get_attribute("value")
 
-    if current_start == "08:00" and current_end == "17:00":
+    if item["start_time"] == "08:00" and item["end_time"] == "17:00":
         logging.info(f"Task for {item['date']} already exists (08:00-17:00), skipping.")
     else:
-    
         start_time_field.clear()
         start_time_field.send_keys(item["start_time"])
         logging.info(f"Filled start time: {item['start_time']}")
