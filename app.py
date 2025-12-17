@@ -12,6 +12,15 @@ DATA_FILE = 'data.json'
 def save():
     try:
         data = request.get_json()
+        for item in data:
+            text = item["task_description"]
+
+            if text.startswith('"') and text.endswith('"'):
+                text = text[1:-1]
+
+            item["task_description"] = text
+      
+        print(data)
         with open(DATA_FILE, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
         return jsonify({"status": "success", "message": "Data saved!"})
