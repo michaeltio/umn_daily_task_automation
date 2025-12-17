@@ -113,23 +113,23 @@ for item in data:
     supervisor_option.click()
     logging.info(f"Selected Approver: {item['approver']}")
 
-    # submit_button = wait.until(
-    #     EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Submit')]"))
-    # )
-
     # Submit 
-    # driver.execute_script("arguments[0].scrollIntoView(true);", submit_button)
-    # driver.execute_script("arguments[0].click();", submit_button)
+    submit_button = wait.until(
+        EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Submit')]"))
+    )
 
-    # yes_button = WebDriverWait(driver, 10).until(
-    #     EC.element_to_be_clickable((By.XPATH, "//button[normalize-space()='Yes']"))
-    # )
+    driver.execute_script("arguments[0].scrollIntoView(true);", submit_button)
+    driver.execute_script("arguments[0].click();", submit_button)
 
-    # driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", yes_button)
+    yes_button = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.XPATH, "//button[normalize-space()='Yes']"))
+    )
 
-    # driver.execute_script("arguments[0].click();", yes_button)
+    driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", yes_button)
 
-    time.sleep(10);
+    driver.execute_script("arguments[0].click();", yes_button)
+
+    # time.sleep(10);
     logging.info("Form submitted successfully")
 
 
