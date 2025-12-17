@@ -1,0 +1,16 @@
+[
+  {
+    "date": "13-09-2025",
+    "start_time": "19:00",
+    "end_time": "23:00",
+    "task_description": "Bab1:\n-: Memperbaiki Sitasi Paragraf 1 dan paragraf 2\n-: Crosscheck  penggunaan huruf besar dan kalimat pada keseluruhan bab 1",
+    "approver": "Advisor"
+  },
+  {
+    "date": "15-09-2025",
+    "start_time": "19:00",
+    "end_time": "21:00",
+    "task_description": "Bab 2:\n-: Membuat Poin 2.1",
+    "approver": "Advisor"
+  }
+]
