@@ -101,38 +101,35 @@ for item in data:
         descr_field.send_keys(item["task_description"])
         logging.info(f"Filled description: {item['task_description']}")
 
-    descr_field = driver.find_element(By.ID, "taskdaily-descr")
-  
-    descr_field.send_keys(item["task_description"])
-    logging.info(f"Filled description: {item['task_description']}")
-
     approver_dropdown = wait.until(
         EC.element_to_be_clickable((By.ID, "select2-type-container"))
     )
+    
     approver_dropdown.click()
 
     supervisor_option = wait.until(
-        EC.element_to_be_clickable((By.XPATH, "//li[contains(text(), 'Supervisor')]"))
+        EC.element_to_be_clickable((By.XPATH, f"//li[contains(text(), '{item['approver']}')]"))
     )
     supervisor_option.click()
-    logging.info("Selected Approver: Supervisor")
+    logging.info(f"Selected Approver: {item['approver']}")
 
-    submit_button = wait.until(
-        EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Submit')]"))
-    )
+    # submit_button = wait.until(
+    #     EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Submit')]"))
+    # )
 
-    driver.execute_script("arguments[0].scrollIntoView(true);", submit_button)
-    driver.execute_script("arguments[0].click();", submit_button)
+    # Submit 
+    # driver.execute_script("arguments[0].scrollIntoView(true);", submit_button)
+    # driver.execute_script("arguments[0].click();", submit_button)
 
-    yes_button = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.XPATH, "//button[normalize-space()='Yes']"))
-    )
+    # yes_button = WebDriverWait(driver, 10).until(
+    #     EC.element_to_be_clickable((By.XPATH, "//button[normalize-space()='Yes']"))
+    # )
 
-    driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", yes_button)
+    # driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", yes_button)
 
-    driver.execute_script("arguments[0].click();", yes_button)
+    # driver.execute_script("arguments[0].click();", yes_button)
 
-
+    time.sleep(10);
     logging.info("Form submitted successfully")
 
 
